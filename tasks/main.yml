@@ -1,0 +1,42 @@
+---
+# tasks file for mysql_db
+    - name: Install MySQL Server
+      dnf:
+        name: mysql-server
+        state: present
+
+    - name: Create MySQL Config File
+      copy:
+        content: |
+          [client]
+          user=root
+          password="test2"
+
+          [mysql]
+          user=root
+          password="test2"
+        dest: /etc/my.cnf.d/.my.cnf
+
+    - name: Start MySQL Service
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
+
+    - name: Create Application DB
+      mysql_db:
+        name: "{{db_name}}"
+        state: present
+
+    - name: Create Application DB User
+      mysql_user:
+        name: "{{db_user}}"
+        password: "{{db_password}}"
+        priv: employee_db.*:ALL
+        state: present
+
+    - name: Set MySQL root password
+      mysql_user:
+        name: root
+        password: "test2"
+        state: present
